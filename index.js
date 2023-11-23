@@ -3,6 +3,10 @@ const express = require('express');
 const cors = require('cors');
 const app = express();
 
+const pg = require('pg');
+
+
+
 // Basic Configuration
 const port = process.env.PORT || 3000;
 
@@ -22,3 +26,7 @@ app.get('/api/hello', function(req, res) {
 app.listen(port, function() {
   console.log(`Listening on port ${port}`);
 });
+
+// Connect to PostgreSQL Database (ElephantSQL)
+const client= new pg.Client(process.env.ELEPHANTSQL_URI)
+client.connect
