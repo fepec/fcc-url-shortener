@@ -2,6 +2,7 @@ require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const app = express();
+const bodyParser = require('body-parser')
 
 const pg = require('pg');
 
@@ -28,5 +29,6 @@ app.listen(port, function() {
 });
 
 // Connect to PostgreSQL Database (ElephantSQL)
-const client= new pg.Client(process.env.ELEPHANTSQL_URI)
-client.connect
+// const client= new pg.Client(process.env.ELEPHANTSQL_URI)
+// client.connect
+
