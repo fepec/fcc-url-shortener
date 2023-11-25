@@ -20,15 +20,14 @@ const getAllUrls = (req, res) => {
 }
 
 const getUrlById = (req, res) => {
-
-    const id = parseInt(req.params.id)
+    try 
+{    const id = parseInt(req.params.id)
     pool.query('SELECT * FROM url_list WHERE id = $1', [id], (error, results) => {
         if (error) {
-
             throw error
         }
         if (results.rows.length !== 0) {
-            res.json(results.rows[0].url)
+            res.redirect(results.rows[0].url)
         } else {
             res.json({
                 error: "No short URL found for the given input"
@@ -36,7 +35,9 @@ const getUrlById = (req, res) => {
         }
 
 
-    })
+    })} catch(error) {
+        console.log(error.message)
+    }
 
 }
 
@@ -55,14 +56,16 @@ const createUrl = async (req, res) => {
         pool.query('INSERT INTO url_list (url) VALUES ($1) RETURNING *', [url], (error, results) => {
             if (error) throw error
 
-            res.status(201).json(results.rows)
+            res.status(201).json({
+                original_url: results.rows[0].url,
+                short_url: results.rows[0].id})
         })
 
     } catch (error) {
         console.log(error.message)
         if (error.code === 'ENOTFOUND') {
             res.json({
-                error: "Invalid URL"
+                error: 'invalid url'
             })
         } else {
 
