@@ -51,5 +51,7 @@ app.post('/api/shorturl', db.createUrl)
 app.get('/api/all-urls', db.getAllUrls)
 
 // Find shortened URL and redirect
-app.get('/api/shorturl/:id', db.getUrlById) 
+app.get('/api/shorturl/:id', db.getUrlById)
 
+// Remove entry from db (DANGEROUS, SHOULD PROBABLY REMOVE)
+app.post('/api/shorturl/del/:id', db.deleteUrl)
