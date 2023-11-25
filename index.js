@@ -18,7 +18,7 @@ app.use(urlEncodedHandler);
 // Root-level request logger middleware
 // For testing purposes. Remove in production
 app.use((req, res, next) => {
-  console.log(`${req.method} ${req.path} - ${req.ip}`)
+  console.log(req.method, req.path, req.ip, req.body)
   next()
 })
 
