@@ -4,11 +4,12 @@ const cors = require('cors');
 const app = express();
 const bodyParser = require('body-parser')
 const dns = require('node:dns')
+const db = require('./queries')
 
-const { PrismaClient } = require('@prisma/client')
+// const { PrismaClient } = require('@prisma/client')
 
-const prisma = new PrismaClient();
-const pg = require('pg');
+// const prisma = new PrismaClient();
+
 
 // Declare and mount the body-parser as urlEncodedHandler
 const urlEncodedHandler = bodyParser.urlencoded({ extended: false })
@@ -43,91 +44,12 @@ app.listen(port, function () {
 
 
 // Create a route that receives the POST data from the form. 
-app.post('/api/shorturl', async (req, res) => {
-
-  try {
-    const { url } = req.body
-
-    // Check host
-    const validHost = await checkHost(url)
-    console.log(validHost)
-
-    // Check if the URL already exists in the database
-    const existingUrl = await prisma.url_list.findUnique({
-      where: {
-        url: url
-      }
-    });
-
-    // If the URL exists, return the existing record
-    if (existingUrl) {
-      return res.json(existingUrl);
-    }
-
-    // If the URL does not exist, create a new record
-    const newUrl = await prisma.url_list.create({
-      data: {
-        url
-      }
-    });
-    res.json(newUrl)
-  } catch (error) {
-    console.log(error.message)
-    if (error.code === 'ENOTFOUND') {
-      res.json({
-        error: "Invalid URL"
-      })
-    } else {
-
-      res.status(500).json({
-        message: "Internal Server Error",
-      })
-    }
-  }
-})
+app.post('/api/shorturl', db.createUrl)
 
 // Get all Stored URLS
 
-app.get('/api/all-urls', async (req, res) => {
-  try {
-    const urls = await prisma.url_list.findMany()
-
-    res.json(urls)
-  } catch (error) {
-    res.status(500).json({
-      message: "Something went wrong"
-    })
-  }
-})
+app.get('/api/all-urls', db.getAllUrls)
 
 // Find shortened URL and redirect
-app.get('/api/shorturl/:id', async (req, res) => {
-  try {
-    const url = await prisma.url_list.findUnique({
-      where: {
-        id: Number(req.params.id)
-      }
-    });
-    if (url) {
-      res.redirect(url.url)
-    } else {
-      res.json({
-        error: "No short URL found for the given input"
-      })
-    }
-  } catch (error) {
-    res.status(500).json({
-      message: "Something went wrong"
-    })
-  }
-})
+app.get('/api/shorturl/:id', db.getUrlById)
 
-
-async function checkHost(url) {
-  return new Promise((resolve, reject) => {
-    dns.lookup(url, (err, address) => {
-      if (err) reject(err);
-      resolve(address);
-    });
-  });
-}
